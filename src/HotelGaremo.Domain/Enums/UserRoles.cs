@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HotelGaremo.Domain.Enums
+namespace HotelGaremo.Domain.Enums;
+
+public enum UserRoles
 {
-    internal class UserRoles
-    {
-    }
+    User,
+    Admin
 }

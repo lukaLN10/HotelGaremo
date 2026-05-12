@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace HotelGaremo.Domain.Enums;
 
-public enum BookingStatus
+public enum PaymentType 
 {
-    Pending,
-    Approved,
-    CanceledByAdmin,
-    CanceledByUser,
-    CheckedIn,
-    CheckedOut,
-    NoShow,
+    FullPayment,
+    PartialPayment,
 }
