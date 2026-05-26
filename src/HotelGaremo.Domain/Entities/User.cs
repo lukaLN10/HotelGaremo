@@ -23,6 +23,7 @@ public class User : BaseEntity
 
 
     public List<Booking> Bookings { get; private set; } = new List<Booking>();
+    public List<Review> Reviews { get; private set; } = new List<Review>();
 
     private User() { }
 

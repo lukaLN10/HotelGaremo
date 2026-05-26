@@ -18,6 +18,8 @@ public class Cottage : BaseEntity
 
     public List<CottageRoom> CottageRooms { get; private set; } = new List<CottageRoom>();
     public List<Booking> Bookings { get; private set; } = new List<Booking>();
+    public List<CottageImage> CottageImages { get; private set; } = new List<CottageImage>();
+
 
     private Cottage() { }
 

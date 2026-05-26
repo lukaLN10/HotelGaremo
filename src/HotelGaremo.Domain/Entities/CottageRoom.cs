@@ -20,6 +20,8 @@ public class CottageRoom : BaseEntity
     public int CottageId { get; private set; }
     public Cottage Cottage { get; private set; }
 
+    public List<CottageImage> RoomImages { get; private set; } = new List<CottageImage>();
+
     private CottageRoom() { }
 
     public CottageRoom(RoomType roomType, string name, bool hasJacuzzi, int bedCount, int? sofaBedCount, int cottageId)
