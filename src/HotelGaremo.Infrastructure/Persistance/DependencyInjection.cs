@@ -1,6 +1,9 @@
-﻿using HotelGaremo.Application.Interfaces;
+﻿using HotelGaremo.Application.Abstraction;
+using HotelGaremo.Application.Interfaces;
+using HotelGaremo.Infrastructure.Persistance;
 using HotelGaremo.Infrastructure.Services;
 using HotelGaremo.Infrastructure.Settings;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,8 +15,14 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddScoped<IDataContext, AppDbContext>();
+
         services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         services.AddScoped<IEmailSender, EmailSender>();
+
         return services;
     }
 }
