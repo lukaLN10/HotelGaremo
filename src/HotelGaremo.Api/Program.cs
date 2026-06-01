@@ -1,3 +1,5 @@
+using HotelGaremo.Application;
+using HotelGaremo.Application.Features.Users.CreateUser;
 using HotelGaremo.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();

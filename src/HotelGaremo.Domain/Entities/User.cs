@@ -27,7 +27,14 @@ public class User : BaseEntity
 
     private User() { }
 
-    public User(string name, string lastName, string email, DateTime dateOfBirth, string password, string phoneNumber)
+    public User(
+        string name,
+        string lastName,
+        string email,
+        DateTime dateOfBirth,
+        string password,
+        string phoneNumber,
+        int verificationCode)
     {
         Name = name;
         LastName = lastName;
@@ -35,6 +42,8 @@ public class User : BaseEntity
         DateOfBirth = dateOfBirth;
         Password = password;
         PhoneNumber = phoneNumber;
+        VerificationCode = verificationCode;
+
         Role = UserRoles.User;
         IsVerified = false;
     }

@@ -17,4 +17,7 @@ public interface IDataContext
     DbSet<Review> Reviews { get; }
     DbSet<User> Users { get; }
 
+    Task<int> SaveChangesAsync(
+    CancellationToken cancellationToken = default);
+
 }
