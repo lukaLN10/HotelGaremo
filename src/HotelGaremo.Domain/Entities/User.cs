@@ -47,4 +47,29 @@ public class User : BaseEntity
         Role = UserRoles.User;
         IsVerified = false;
     }
+
+    public void Verify()
+    {
+        IsVerified = true;
+    }
+
+    public void ChangeRole(UserRoles role)
+    {
+        Role = role;
+    }
+
+    public void SetPasswordRecoveryCode(int code)
+    {
+        PasswordRecoveryCode = code;
+    }
+
+    public void ChangePassword(string password)
+    {
+        Password = password;
+    }
+
+    public void ClearPasswordRecoveryCode()
+    {
+        PasswordRecoveryCode = null;
+    }
 }

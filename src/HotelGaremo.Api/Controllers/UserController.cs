@@ -1,4 +1,8 @@
-﻿using HotelGaremo.Application.Features.Users.CreateUser;
+﻿using HotelGaremo.Application.Features.Users.ChangeUserRole;
+using HotelGaremo.Application.Features.Users.CreateUser;
+using HotelGaremo.Application.Features.Users.RecoveryPassword;
+using HotelGaremo.Application.Features.Users.SendPasswordRecoveryCode;
+using HotelGaremo.Application.Features.Users.VerifyUser;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +26,32 @@ public class UserController : ControllerBase
         var response = await mediator.Send(command);
         return Ok(response);
 
-    } 
+    }
+    [HttpPut("Verify-User")]
+    public async Task<IActionResult> VerifyUser(VerifyUserCommand command)
+    {
+        var response = await mediator.Send(command);
+        return Ok(response);
+    }
+    [HttpPut("Change-User-Role")]
+    public async Task<IActionResult> ChangeUserRole(ChangeUserRoleCommand command)
+    {
+        var response = await mediator.Send(command);
+        return Ok(response);
+    }
+    [HttpPost("Send-Password-Recovery-Code")]
+    public async Task<IActionResult> SendPasswordRecoveryCode(SendPasswordRecoveryCodeCommand command)
+    {
+        var response = await mediator.Send(command);
+        return Ok(response);
+    }
+    [HttpPost("Recovery-Password")]
+    public async Task<IActionResult> RecoveryPassword(RecoveryPasswordCommand command)
+    {
+        var response = await mediator.Send(command);
+        return Ok(response);
+    }
+
+
 }
 
