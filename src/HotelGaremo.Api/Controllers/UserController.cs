@@ -1,57 +1,29 @@
-﻿using HotelGaremo.Application.Features.Users.ChangeUserRole;
-using HotelGaremo.Application.Features.Users.CreateUser;
-using HotelGaremo.Application.Features.Users.RecoveryPassword;
-using HotelGaremo.Application.Features.Users.SendPasswordRecoveryCode;
-using HotelGaremo.Application.Features.Users.VerifyUser;
+﻿using HotelGaremo.Application.Features.Users.CreateUser;
+using HotelGaremo.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-namespace HotelGaremo.Api.Controllers;
-
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class UserController : ControllerBase
 {
     private readonly IMediator mediator;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(IMediator mediator)
+    public UserController(IMediator mediator, ILogger<UserController> logger)
     {
         this.mediator = mediator;
+        _logger = logger;
     }
 
-    [HttpPost ("Create-User")]
+    [HttpPost("Create-User")]
     public async Task<IActionResult> CreateUser(CreateUserCommand command)
     {
         var response = await mediator.Send(command);
-        return Ok(response);
-
-    }
-    [HttpPut("Verify-User")]
-    public async Task<IActionResult> VerifyUser(VerifyUserCommand command)
-    {
-        var response = await mediator.Send(command);
+        _logger.LogInformation("მომხმარებელი დარეგისტრირდა: {FirstName} {LastName}",
+            command.Name, command.LastName);
         return Ok(response);
     }
-    [HttpPut("Change-User-Role")]
-    public async Task<IActionResult> ChangeUserRole(ChangeUserRoleCommand command)
-    {
-        var response = await mediator.Send(command);
-        return Ok(response);
-    }
-    [HttpPost("Send-Password-Recovery-Code")]
-    public async Task<IActionResult> SendPasswordRecoveryCode(SendPasswordRecoveryCodeCommand command)
-    {
-        var response = await mediator.Send(command);
-        return Ok(response);
-    }
-    [HttpPost("Recovery-Password")]
-    public async Task<IActionResult> RecoveryPassword(RecoveryPasswordCommand command)
-    {
-        var response = await mediator.Send(command);
-        return Ok(response);
-    }
-
-
 }
-

@@ -17,12 +17,10 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
         services.AddScoped<IDataContext, AppDbContext>();
-
         services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         services.AddScoped<IEmailSender, EmailSender>();
-
+        services.AddScoped<IInvoiceService, InvoiceService>(); 
         return services;
     }
 }

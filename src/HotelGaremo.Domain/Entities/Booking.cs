@@ -11,6 +11,8 @@ namespace HotelGaremo.Domain.Entities;
 public class Booking : BaseEntity
 {
     public string BookingNumber { get; private set; }
+    public string? GroupBookingNumber { get; private set; }
+
     public DateTime CheckIn { get; private set; }
     public DateTime CheckOut { get; private set; }
     public decimal TotalPrice { get; private set; }

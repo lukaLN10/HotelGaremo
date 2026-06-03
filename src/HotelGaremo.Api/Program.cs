@@ -2,10 +2,17 @@ using HotelGaremo.Api.Middleware;
 using HotelGaremo.Application;
 using HotelGaremo.Application.Features.Users.CreateUser;
 using HotelGaremo.Infrastructure;
+using Serilog;
 using System.Text.Json.Serialization;
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
