@@ -19,6 +19,7 @@ public class User : BaseEntity
     public int VerificationCode { get; private set; }
     public bool IsVerified { get; private set; }
     public int? PasswordRecoveryCode { get; private set; }
+    public DateTime? PasswordRecoveryCodeExpiry { get; private set; }
     public UserRoles Role { get; private set; }
 
 
@@ -61,8 +62,8 @@ public class User : BaseEntity
     public void SetPasswordRecoveryCode(int code)
     {
         PasswordRecoveryCode = code;
+        PasswordRecoveryCodeExpiry = DateTime.UtcNow.AddMinutes(10);
     }
-
     public void ChangePassword(string password)
     {
         Password = password;
@@ -71,5 +72,15 @@ public class User : BaseEntity
     public void ClearPasswordRecoveryCode()
     {
         PasswordRecoveryCode = null;
+        PasswordRecoveryCodeExpiry = null;
+    }
+
+    public void UpdateProfile(string name, string lastName, string phoneNumber, DateTime dateOfBirth)
+    {
+        Name = name;
+        LastName = lastName;
+        PhoneNumber = phoneNumber;
+        DateOfBirth = dateOfBirth;
+        SetUpdatedAt();
     }
 }

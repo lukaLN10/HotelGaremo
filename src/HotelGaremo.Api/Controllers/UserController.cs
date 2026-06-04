@@ -1,10 +1,17 @@
 ﻿using HotelGaremo.Application.Common;
+using HotelGaremo.Application.Features.Users.ChangeUserRole;
 using HotelGaremo.Application.Features.Users.CreateUser;
+using HotelGaremo.Application.Features.Users.ForgotPassword;
+using HotelGaremo.Application.Features.Users.GetUserById;
+using HotelGaremo.Application.Features.Users.GetUsers;
 using HotelGaremo.Application.Features.Users.LogIn;
+using HotelGaremo.Application.Features.Users.ResetPassword;
+using HotelGaremo.Application.Features.Users.UpdateUser;
 using HotelGaremo.Application.Features.Users.VerifyUser;
 using HotelGaremo.Application.requests;
 using HotelGaremo.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,6 +27,30 @@ public class UserController : ControllerBase
     {
         this.mediator = mediator;
         _logger = logger;
+    }
+
+    [HttpGet("Get-User/{id}")]
+    public async Task<IActionResult> GetUserById(int id)
+    {
+        var response = await mediator.Send(new GetUserByIdQuery(id));
+        return Ok(new ApiResponse<GetUserByIdResponse>
+        {
+            StatusCode = 200,
+            Message = "მომხმარებელი წარმატებით მოიძებნა.",
+            Data = response
+        });
+    }
+
+    [HttpGet("Get-Users")]
+    public async Task<IActionResult> GetUsers()
+    {
+        var response = await mediator.Send(new GetUsersQuery());
+        return Ok(new ApiResponse<List<GetUsersResponse>>
+        {
+            StatusCode = 200,
+            Message = "მომხმარებლები წარმატებით მოიძებნა.",
+            Data = response
+        });
     }
 
     [HttpPost("Create-User")]
@@ -54,6 +85,63 @@ public class UserController : ControllerBase
         var response = await mediator.Send(command);
         _logger.LogInformation("User verified: {Email}", email);
         return Ok(new ApiResponse<VerifyUserResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
+    [HttpPost("Forgot-Password/{email}")]
+    public async Task<IActionResult> ForgotPassword([FromRoute] string email)
+    {
+        var command = new ForgotPasswordCommand(email);
+        var response = await mediator.Send(command);
+        return Ok(new ApiResponse<ForgotPasswordResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
+    [HttpPost("Reset-Password/{email}")]
+    public async Task<IActionResult> ResetPassword(
+        [FromRoute] string email,
+        [FromBody] ResetPasswordRequest request)
+    {
+        var command = new ResetPasswordCommand(email, request.Code, request.NewPassword);
+        var response = await mediator.Send(command);
+        return Ok(new ApiResponse<ResetPasswordResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
+    //[Authorize(Roles = "Admin")]
+    [HttpPost("Change-Role/{userId}")]
+    public async Task<IActionResult> ChangeUserRole(
+        [FromRoute] int userId,
+        [FromBody] ChangeUserRoleRequest request)
+    {
+        var command = new ChangeUserRoleCommand(userId, request.Role);
+        var response = await mediator.Send(command);
+        return Ok(new ApiResponse<ChangeUserRoleResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
+    [Authorize]
+    [HttpPut("Update-User")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand command)
+    {
+        var response = await mediator.Send(command);
+        return Ok(new ApiResponse<UpdateUserResponse>
         {
             StatusCode = 200,
             Message = response.Message,
