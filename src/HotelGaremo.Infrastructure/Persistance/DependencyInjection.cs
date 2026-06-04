@@ -20,7 +20,9 @@ public static class DependencyInjection
         services.AddScoped<IDataContext, AppDbContext>();
         services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         services.AddScoped<IEmailSender, EmailSender>();
-        services.AddScoped<IInvoiceService, InvoiceService>(); 
+        services.AddScoped<IInvoiceService, InvoiceService>();
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings")); // ✅
+        services.AddScoped<IJwtService, JwtService>(); // ✅
         return services;
     }
 }
