@@ -16,16 +16,17 @@ public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<GetUsersRespo
     public async Task<List<GetUsersResponse>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
         return await _db.Users
-            .Select(u => new GetUsersResponse(
-                u.Id,
-                u.Name,
-                u.LastName,
-                u.Email,
-                u.PhoneNumber,
-                u.DateOfBirth,
-                u.Role,
-                u.IsVerified,
-                u.CreatedAt))
-            .ToListAsync(cancellationToken);
+         .Where(u => u.IsActive)
+         .Select(u => new GetUsersResponse(
+             u.Id,
+             u.Name,
+             u.LastName,
+             u.Email,
+             u.PhoneNumber,
+             u.DateOfBirth,
+             u.Role,
+             u.IsVerified,
+             u.CreatedAt))
+         .ToListAsync(cancellationToken);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using HotelGaremo.Application.Abstraction;
+using HotelGaremo.Application.Common;
 using HotelGaremo.Application.Features.Users.LogIn;
 using HotelGaremo.Application.Interfaces;
 using MediatR;
@@ -24,22 +25,23 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
         var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-        {
             throw new ValidationException(new List<ValidationFailure>
-        {
-            new ValidationFailure("Credentials", "მეილი ან პაროლი არასწორია.")
-        });
-        }
+    {
+        new ValidationFailure("Credentials", "მეილი ან პაროლი არასწორია.")
+    });
+
+        if (!user.IsActive)
+            throw new BadRequestException("ანგარიში დეაქტივირებულია.");
 
         if (!user.IsVerified)
-        {
             throw new ValidationException(new List<ValidationFailure>
-        {
-            new ValidationFailure("Email", "ანგარიში ვერიფიცირებული არ არის.")
-        });
-        }
+    {
+        new ValidationFailure("Email", "ანგარიში ვერიფიცირებული არ არის.")
+    });
 
         var token = _jwtService.GenerateToken(user);
         return new LoginResponse(token);
+
+
     }
 }

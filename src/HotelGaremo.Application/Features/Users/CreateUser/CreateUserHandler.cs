@@ -35,19 +35,27 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
         var verificationCode = Random.Shared.Next(100000, 999999);
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-        var user = new User(
-            request.Name,
-            request.LastName,
-            request.Email,
-            request.DateOfBirth,
-            hashedPassword,  
-            request.PhoneNumber,
-            verificationCode);
-
         var errors = new List<ValidationFailure>();
 
-        if (await _db.Users.AnyAsync(u => u.Email == request.Email, cancellationToken))
+        var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+
+        if (existingUser is not null)
+        {
+            if (!existingUser.IsActive)
+            {
+                existingUser.Reactivate(hashedPassword, verificationCode);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                await emailSender.SendEmailToUserAsync(
+                    request.Email,
+                    "Verification Code",
+                    $"Your verification code is: {verificationCode}");
+
+                return new CreateUserResponse(existingUser.Id);
+            }
+
             errors.Add(new ValidationFailure("Email", "ეს მეილი უკვე რეგისტრირებულია."));
+        }
 
         if (await _db.Users.AnyAsync(u => u.PhoneNumber == request.PhoneNumber, cancellationToken))
             errors.Add(new ValidationFailure("PhoneNumber", "ეს ტელეფონის ნომერი უკვე რეგისტრირებულია."));
@@ -55,6 +63,14 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
         if (errors.Any())
             throw new ValidationException(errors);
 
+        var user = new User(
+            request.Name,
+            request.LastName,
+            request.Email,
+            request.DateOfBirth,
+            hashedPassword,
+            request.PhoneNumber,
+            verificationCode);
 
         await _db.Users.AddAsync(user, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
@@ -65,6 +81,6 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
             $"Your verification code is: {verificationCode}");
 
         return new CreateUserResponse(user.Id);
-
     }
 }
+

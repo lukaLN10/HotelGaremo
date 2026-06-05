@@ -1,6 +1,8 @@
 ﻿using HotelGaremo.Application.Common;
 using HotelGaremo.Application.Features.Users.ChangeUserRole;
 using HotelGaremo.Application.Features.Users.CreateUser;
+using HotelGaremo.Application.Features.Users.DeleteUser;
+using HotelGaremo.Application.Features.Users.DeleteUserByAdmin;
 using HotelGaremo.Application.Features.Users.ForgotPassword;
 using HotelGaremo.Application.Features.Users.GetUserById;
 using HotelGaremo.Application.Features.Users.GetUsers;
@@ -57,6 +59,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> CreateUser(CreateUserCommand command)
     {
         var response = await mediator.Send(command);
+        _logger.LogInformation("User created with ID: {UserId}", response.id);
         return Ok(new ApiResponse<CreateUserResponse>
         {
             StatusCode = 200,
@@ -145,6 +148,33 @@ public class UserController : ControllerBase
         {
             StatusCode = 200,
             Message = response.Message,
+            Data = response
+        });
+    }
+
+    [Authorize]
+    [HttpDelete("Delete-User")]
+    public async Task<IActionResult> DeleteUser()
+    {
+        var response = await mediator.Send(new DeleteUserCommand());
+        _logger.LogInformation("User deactivated.");
+        return Ok(new ApiResponse<DeleteUserResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
+    [HttpDelete("Delete-User-By-Admin/{userId}")]
+    public async Task<IActionResult> DeleteUserByAdmin(int userId)
+    {
+        var response = await mediator.Send(new DeleteUserByAdminCommand(userId));
+        _logger.LogInformation("User deactivated by admin. UserId: {UserId}", userId);
+        return Ok(new ApiResponse<DeleteUserByAdminResponse>
+        {
+            StatusCode = 200,
+            Message = response.message,
             Data = response
         });
     }

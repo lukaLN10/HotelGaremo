@@ -19,6 +19,8 @@ public class User : BaseEntity
     public int VerificationCode { get; private set; }
     public bool IsVerified { get; private set; }
     public int? PasswordRecoveryCode { get; private set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime? DeletedAt { get; set; }
     public DateTime? PasswordRecoveryCodeExpiry { get; private set; }
     public UserRoles Role { get; private set; }
 
@@ -73,6 +75,20 @@ public class User : BaseEntity
     {
         PasswordRecoveryCode = null;
         PasswordRecoveryCodeExpiry = null;
+    }
+    public void Deactivate()
+    {
+        IsActive = false;
+        DeletedAt = DateTime.UtcNow;
+    }
+
+    public void Reactivate(string password, int verificationCode)
+    {
+        IsActive = true;
+        DeletedAt = null;
+        ChangePassword(password);
+        VerificationCode = verificationCode;
+        IsVerified = false;
     }
 
     public void UpdateProfile(string name, string lastName, string phoneNumber, DateTime dateOfBirth)

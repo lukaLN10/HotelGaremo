@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using HotelGaremo.Application.Common;
 using Microsoft.Extensions.Logging;
 
 namespace HotelGaremo.Api.Middleware;
@@ -29,9 +30,18 @@ public class ExceptionHandlingMiddleware
                 errors = ex.Errors.Select(e => e.ErrorMessage)
             });
         }
+        catch (BadRequestException ex)  
+        {
+            context.Response.StatusCode = 400;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = ex.Message
+            });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "დაფიქსირდა შეცდომა: {Message}", ex.Message); 
+            _logger.LogError(ex, "დაფიქსირდა შეცდომა: {Message}", ex.Message);
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsJsonAsync(new

@@ -22,4 +22,11 @@ public class Review : BaseEntity
         Rating = rating;
         UserId = userId;
     }
+
+    public void Update(string comment, int rating)
+    {
+        Comment = comment;
+        Rating = rating;
+        SetUpdatedAt();
+    }
 }

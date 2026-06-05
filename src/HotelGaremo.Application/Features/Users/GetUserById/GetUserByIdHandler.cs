@@ -18,7 +18,7 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdR
     public async Task<GetUserByIdResponse> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
         var user = await _db.Users
-            .Where(u => u.Id == request.Id)
+            .Where(u => u.Id == request.Id && u.IsActive)
             .Select(u => new GetUserByIdResponse(
                 u.Id,
                 u.Name,
