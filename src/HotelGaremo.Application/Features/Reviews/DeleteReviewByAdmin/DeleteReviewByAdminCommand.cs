@@ -7,4 +7,4 @@ using System.Threading.Tasks;
 
 namespace HotelGaremo.Application.Features.Reviews.DeleteReviewByAdmin;
 
-public record DeleteReviewByAdminCommand(int reviewId) : IRequest<DeleteReviewByAdminResponse>;
+public record DeleteReviewByAdminCommand(int ReviewId) : IRequest<DeleteReviewByAdminResponse>;

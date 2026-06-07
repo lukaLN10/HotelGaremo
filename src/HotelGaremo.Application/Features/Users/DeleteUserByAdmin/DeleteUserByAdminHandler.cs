@@ -21,7 +21,7 @@ public class DeleteUserByAdminHandler : IRequestHandler<DeleteUserByAdminCommand
 
     public async Task<DeleteUserByAdminResponse> Handle(DeleteUserByAdminCommand request, CancellationToken cancellationToken)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == request.userId, cancellationToken);
+        var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
         if (user is null)
             throw new BadRequestException("მომხმარებელი ვერ მოიძებნა.");

@@ -21,8 +21,9 @@ public static class DependencyInjection
         services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         services.AddScoped<IEmailSender, EmailSender>();
         services.AddScoped<IInvoiceService, InvoiceService>();
-        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings")); // ✅
-        services.AddScoped<IJwtService, JwtService>(); // ✅
+        services.AddScoped<IImageService, ImageService>();
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings")); 
+        services.AddScoped<IJwtService, JwtService>(); 
         return services;
     }
 }

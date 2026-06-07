@@ -21,7 +21,7 @@ public class DeleteReviewByAdminHandler : IRequestHandler<DeleteReviewByAdminCom
 
     public async Task<DeleteReviewByAdminResponse> Handle(DeleteReviewByAdminCommand request, CancellationToken cancellationToken)
     {
-        var review = await _db.Reviews.FirstOrDefaultAsync(x => x.Id == request.reviewId, cancellationToken);
+        var review = await _db.Reviews.FirstOrDefaultAsync(x => x.Id == request.ReviewId, cancellationToken);
 
         if (review is null)
             throw new BadRequestException("რევიუ ვერ მოიძებნა.");

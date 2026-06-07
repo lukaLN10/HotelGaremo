@@ -32,5 +32,13 @@ public class Cottage : BaseEntity
         MaxGuests = maxGuests;
     }
 
+    public void Update(string cottageName, string description, int roomCount, decimal pricePerNight, int maxGuests)
+    {
+        CottageName = cottageName;
+        Description = description;
+        RoomCount = roomCount;
+        PricePerNight = pricePerNight;
+        MaxGuests = maxGuests;
+    }
 
 }

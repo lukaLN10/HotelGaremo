@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace HotelGaremo.Application.Features.Users.DeleteUserByAdmin;
 
-public record DeleteUserByAdminCommand(int userId) : IRequest<DeleteUserByAdminResponse>;
+public record DeleteUserByAdminCommand(int UserId) : IRequest<DeleteUserByAdminResponse>;
 
