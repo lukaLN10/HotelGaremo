@@ -33,4 +33,13 @@ public class CottageRoom : BaseEntity
         SofaBedCount = sofaBedCount;
         CottageId = cottageId;
     }
+
+    public void Update(RoomType roomType, string name, bool hasJacuzzi, int bedCount, int? sofaBedCount)
+    {
+        RoomType = roomType;
+        Name = name;
+        HasJacuzzi = hasJacuzzi;
+        BedCount = bedCount;
+        SofaBedCount = sofaBedCount;
+    }
 }
