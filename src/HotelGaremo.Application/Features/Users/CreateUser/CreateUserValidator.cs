@@ -14,13 +14,14 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.Name)
             .NotEmpty()
             .MaximumLength(100)
-            .MinimumLength(3);
-
+            .MinimumLength(3)
+            .Matches(@"^[a-zA-Zა-ჰ]+$").WithMessage("Name must contain only letters.");
 
         RuleFor(x => x.LastName)
             .NotEmpty()
             .MaximumLength(100)
-            .MinimumLength(5);
+            .MinimumLength(5)
+            .Matches(@"^[a-zA-Zა-ჰ]+$").WithMessage("Last name must contain only letters.");
 
 
         RuleFor(x => x.Email)

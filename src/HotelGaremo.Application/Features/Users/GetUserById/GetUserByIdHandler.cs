@@ -18,17 +18,9 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdR
     public async Task<GetUserByIdResponse> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
         var user = await _db.Users
+            .Include(u => u.Bookings)
+            .Include(u => u.Reviews)
             .Where(u => u.Id == request.Id && u.IsActive)
-            .Select(u => new GetUserByIdResponse(
-                u.Id,
-                u.Name,
-                u.LastName,
-                u.Email,
-                u.PhoneNumber,
-                u.DateOfBirth,
-                u.Role,
-                u.IsVerified,
-                u.CreatedAt))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (user is null)
@@ -37,6 +29,27 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdR
                 new("Id", "მომხმარებელი ვერ მოიძებნა.")
             });
 
-        return user;
+        return new GetUserByIdResponse(
+            user.Id,
+            user.Name,
+            user.LastName,
+            user.Email,
+            user.PhoneNumber,
+            user.DateOfBirth,
+            user.Role,
+            user.IsVerified,
+            user.CreatedAt,
+            user.Bookings.Select(b => new UserBookingDto(
+                b.BookingNumber,
+                b.CheckIn,
+                b.CheckOut,
+                b.GuestCount,
+                b.TotalPrice,
+                b.PaymentType,
+                b.BookingStatus)).ToList(),
+            user.Reviews.Select(r => new UserReviewDto(
+                r.Id,
+                r.Comment,
+                r.Rating)).ToList());
     }
 }

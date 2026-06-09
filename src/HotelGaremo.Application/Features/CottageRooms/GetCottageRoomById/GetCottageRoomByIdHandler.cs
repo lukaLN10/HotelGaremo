@@ -17,6 +17,7 @@ public class GetCottageRoomByIdHandler : IRequestHandler<GetCottageRoomByIdQuery
     public async Task<GetCottageRoomByIdResponse> Handle(GetCottageRoomByIdQuery request, CancellationToken cancellationToken)
     {
         var room = await _db.CottageRooms
+            .Include(x => x.Cottage)
             .FirstOrDefaultAsync(x => x.Id == request.RoomId, cancellationToken);
 
         if (room == null)
@@ -28,6 +29,8 @@ public class GetCottageRoomByIdHandler : IRequestHandler<GetCottageRoomByIdQuery
             room.RoomType,
             room.HasJacuzzi,
             room.BedCount,
-            room.SofaBedCount);
+            room.SofaBedCount,
+            room.CottageId,
+            room.Cottage.CottageName);
     }
 }

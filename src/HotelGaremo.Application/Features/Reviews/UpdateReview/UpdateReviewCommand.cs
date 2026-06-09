@@ -1,9 +1,13 @@
 using MediatR;
+using System.Text.Json.Serialization;
 
 namespace HotelGaremo.Application.Features.Reviews.UpdateReview;
 
 public record UpdateReviewCommand(
-    int ReviewId,
     string Comment,
     int Rating
-) : IRequest<UpdateReviewResponse>;
+) : IRequest<UpdateReviewResponse>
+{
+    [JsonIgnore]
+    public int ReviewId { get; init; }
+}

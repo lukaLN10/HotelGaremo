@@ -10,6 +10,9 @@ public class CreateCottageRoomValidator : AbstractValidator<CreateCottageRoomCom
             .NotEmpty().WithMessage("ოთახის სახელი სავალდებულოა.")
             .MaximumLength(100).WithMessage("სახელი მაქსიმუმ 100 სიმბოლო.");
 
+        RuleFor(x => x.RoomType)
+            .IsInEnum().WithMessage("მითითებული ოთახის ტიპი არ არსებობს.");
+
         RuleFor(x => x.BedCount)
             .GreaterThan(0).WithMessage("საწოლების რაოდენობა უნდა იყოს 0-ზე მეტი.")
             .When(x => x.RoomType != Domain.Enums.RoomType.BATHROOM &&

@@ -8,4 +8,6 @@ public record GetCottageRoomByIdResponse(
     RoomType RoomType,
     bool HasJacuzzi,
     int BedCount,
-    int? SofaBedCount);
+    int? SofaBedCount,
+    int CottageId,
+    string CottageName);

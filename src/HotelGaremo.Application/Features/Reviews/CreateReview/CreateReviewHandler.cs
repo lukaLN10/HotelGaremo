@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using HotelGaremo.Application.Abstraction;
 using HotelGaremo.Application.Common;
 using HotelGaremo.Domain.Entities;
+using HotelGaremo.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -37,10 +38,10 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, CreateRe
             .FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
         var hasBooking = await _db.Bookings
-            .AnyAsync(b => b.UserId == userId, cancellationToken);
+            .AnyAsync(b => b.UserId == userId && b.BookingStatus == BookingStatus.Completed, cancellationToken);
 
         if (!hasBooking)
-            throw new BadRequestException("რევიუს დასაწერად მინიმუმ 1 ჯავშანი გჭირდება.");
+            throw new BadRequestException("რევიუს დასაწერად მინიმუმ 1 დასრულებული ჯავშანი გჭირდება.");
 
         var review = new Review(request.Comment, request.Rating, userId);
 

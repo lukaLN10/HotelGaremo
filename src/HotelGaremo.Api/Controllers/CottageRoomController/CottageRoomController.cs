@@ -7,18 +7,18 @@ using HotelGaremo.Application.Features.CottageRooms.UpdateCottageRoom;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HotelGaremo.Api.Controllers.CottageControler;
+namespace HotelGaremo.Api.Controllers.CottageRoomController;
 
 public record CreateCottageRoomRequest(
     string Name,
-    HotelGaremo.Domain.Enums.RoomType RoomType,
+    Domain.Enums.RoomType RoomType,
     bool HasJacuzzi,
     int BedCount,
     int? SofaBedCount);
 
 public record UpdateCottageRoomRequest(
     string Name,
-    HotelGaremo.Domain.Enums.RoomType RoomType,
+    Domain.Enums.RoomType RoomType,
     bool HasJacuzzi,
     int BedCount,
     int? SofaBedCount);

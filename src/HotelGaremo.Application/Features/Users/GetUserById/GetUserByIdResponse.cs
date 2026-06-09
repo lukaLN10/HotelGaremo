@@ -11,4 +11,20 @@ public record GetUserByIdResponse(
     DateTime DateOfBirth,
     UserRoles Role,
     bool IsVerified,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    List<UserBookingDto> Bookings,
+    List<UserReviewDto> Reviews);
+
+public record UserBookingDto(
+    string BookingNumber,
+    DateTime CheckIn,
+    DateTime CheckOut,
+    int GuestCount,
+    decimal TotalPrice,
+    PaymentType PaymentType,
+    BookingStatus BookingStatus);
+
+public record UserReviewDto(
+    int Id,
+    string Comment,
+    int Rating);
