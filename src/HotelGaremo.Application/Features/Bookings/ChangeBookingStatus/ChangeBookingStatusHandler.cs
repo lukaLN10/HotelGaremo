@@ -1,3 +1,4 @@
+using FluentValidation;
 using HotelGaremo.Application.Abstraction;
 using HotelGaremo.Application.Common;
 using MediatR;
@@ -8,14 +9,17 @@ namespace HotelGaremo.Application.Features.Bookings.ChangeBookingStatus;
 public class ChangeBookingStatusHandler : IRequestHandler<ChangeBookingStatusCommand, ChangeBookingStatusResponse>
 {
     private readonly IDataContext _db;
+    private readonly IValidator<ChangeBookingStatusCommand> _validator;
 
-    public ChangeBookingStatusHandler(IDataContext db)
+    public ChangeBookingStatusHandler(IDataContext db, IValidator<ChangeBookingStatusCommand> validator)
     {
         _db = db;
+        _validator = validator;
     }
 
     public async Task<ChangeBookingStatusResponse> Handle(ChangeBookingStatusCommand request, CancellationToken cancellationToken)
     {
+        await _validator.ValidateAndThrowAsync(request, cancellationToken);
         var booking = await _db.Bookings
             .FirstOrDefaultAsync(x => x.Id == request.BookingId, cancellationToken);
 

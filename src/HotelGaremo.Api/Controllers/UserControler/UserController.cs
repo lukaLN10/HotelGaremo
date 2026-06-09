@@ -31,6 +31,7 @@ public class UserController : ControllerBase
         _logger = logger;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("Get-User/{id}")]
     public async Task<IActionResult> GetUserById(int id)
     {
@@ -43,6 +44,7 @@ public class UserController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("Get-Users")]
     public async Task<IActionResult> GetUsers()
     {
@@ -123,7 +125,7 @@ public class UserController : ControllerBase
         });
     }
 
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPost("Change-Role/{userId}")]
     public async Task<IActionResult> ChangeUserRole(
         [FromRoute] int userId,
@@ -166,6 +168,7 @@ public class UserController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Delete-User-By-Admin/{userId}")]
     public async Task<IActionResult> DeleteUserByAdmin(int userId)
     {

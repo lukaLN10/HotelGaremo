@@ -2,13 +2,16 @@ using HotelGaremo.Application.Common;
 using HotelGaremo.Application.Features.Bookings.CancelBooking;
 using HotelGaremo.Application.Features.Bookings.ChangeBookingStatus;
 using HotelGaremo.Application.Features.Bookings.CreateBooking;
+using HotelGaremo.Application.Features.Bookings.CreateGroupBooking;
 using HotelGaremo.Application.Features.Bookings.GetAllBookings;
 using HotelGaremo.Application.Features.Bookings.GetBookingById;
 using HotelGaremo.Application.Features.Bookings.GetCottageBookings;
 using HotelGaremo.Application.Features.Bookings.GetMyBookings;
 using HotelGaremo.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HotelGaremo.Api.Controllers.BookingController;
 
@@ -17,6 +20,13 @@ public record CreateBookingRequest(
     DateTime CheckOut,
     int GuestCount,
     int CottageId,
+    PaymentType PaymentType);
+
+public record CreateGroupBookingRequest(
+    DateTime CheckIn,
+    DateTime CheckOut,
+    int GuestCount,
+    List<int> CottageIds,
     PaymentType PaymentType);
 
 public record ChangeBookingStatusRequest(BookingStatus BookingStatus);
@@ -34,9 +44,26 @@ public class BookingController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost("Create-Booking/{userId}")]
-    public async Task<IActionResult> CreateBooking(int userId, [FromBody] CreateBookingRequest request)
+    [Authorize]
+    [HttpPost("Create-Group-Booking")]
+    public async Task<IActionResult> CreateGroupBooking([FromBody] CreateGroupBookingRequest request)
     {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var command = new CreateGroupBookingCommand(request.CheckIn, request.CheckOut, request.GuestCount, request.CottageIds, request.PaymentType) { UserId = userId };
+        var response = await _mediator.Send(command);
+        return Ok(new ApiResponse<CreateGroupBookingResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
+    [Authorize]
+    [HttpPost("Create-Booking")]
+    public async Task<IActionResult> CreateBooking([FromBody] CreateBookingRequest request)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var command = new CreateBookingCommand(request.CheckIn, request.CheckOut, request.GuestCount, request.CottageId, request.PaymentType) { UserId = userId };
         var response = await _mediator.Send(command);
         return Ok(new ApiResponse<CreateBookingResponse>
@@ -47,6 +74,7 @@ public class BookingController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("Cancel-Booking/{bookingId}/{userId}")]
     public async Task<IActionResult> CancelBooking(int bookingId, int userId)
     {
@@ -60,9 +88,11 @@ public class BookingController : ControllerBase
         });
     }
 
-    [HttpGet("Get-My-Bookings/{userId}")]
-    public async Task<IActionResult> GetMyBookings(int userId)
+    [Authorize]
+    [HttpGet("Get-My-Bookings")]
+    public async Task<IActionResult> GetMyBookings()
     {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var response = await _mediator.Send(new GetMyBookingsQuery(userId));
         return Ok(new ApiResponse<List<GetMyBookingsResponse>>
         {
@@ -72,6 +102,7 @@ public class BookingController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("Get-All-Bookings")]
     public async Task<IActionResult> GetAllBookings()
     {
@@ -84,6 +115,7 @@ public class BookingController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("Get-Booking/{bookingId}")]
     public async Task<IActionResult> GetBookingById(int bookingId)
     {
@@ -96,6 +128,7 @@ public class BookingController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("Change-Status/{bookingId}")]
     public async Task<IActionResult> ChangeBookingStatus(int bookingId, [FromBody] ChangeBookingStatusRequest request)
     {
@@ -109,6 +142,7 @@ public class BookingController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("Get-Cottage-Bookings/{cottageId}")]
     public async Task<IActionResult> GetCottageBookings(int cottageId)
     {

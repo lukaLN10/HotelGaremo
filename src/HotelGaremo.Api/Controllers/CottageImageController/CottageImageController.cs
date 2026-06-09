@@ -20,8 +20,8 @@ public class CottageImageController : ControllerBase
         _mediator = mediator;
     }
 
- //[Authorize]
-[HttpPost("Upload-Cottage-Image/{cottageId}")]
+    [Authorize(Roles = "Admin")]
+    [HttpPost("Upload-Cottage-Image/{cottageId}")]
 public async Task<IActionResult> UploadCottageImage(int cottageId, [FromForm] AddImage request)
 {
     var command = new UploadCottageImageCommand(request.File, cottageId);
@@ -34,8 +34,8 @@ public async Task<IActionResult> UploadCottageImage(int cottageId, [FromForm] Ad
     });
 }
 
-[Authorize]
-[HttpPost("Upload-Room-Image/{cottageRoomId}")]
+    [Authorize(Roles = "Admin")]
+    [HttpPost("Upload-Room-Image/{cottageRoomId}")]
 public async Task<IActionResult> UploadCottageRoomImage(int cottageRoomId, [FromForm] AddImage request)
 {
     var command = new UploadCottageRoomImageCommand(request.File, cottageRoomId);
@@ -72,7 +72,7 @@ public async Task<IActionResult> UploadCottageRoomImage(int cottageRoomId, [From
         });
     }
 
-    //[Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Delete-Image/{imageId}")]
     public async Task<IActionResult> DeleteImage(int imageId)
     {

@@ -5,6 +5,7 @@ using HotelGaremo.Application.Features.CottageRooms.GetCottageRoomByCottageId;
 using HotelGaremo.Application.Features.CottageRooms.GetCottageRoomById;
 using HotelGaremo.Application.Features.CottageRooms.UpdateCottageRoom;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelGaremo.Api.Controllers.CottageRoomController;
@@ -36,6 +37,7 @@ public class CottageRoomController : ControllerBase
         _logger = logger;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("Create-Room/{cottageId}")]
     public async Task<IActionResult> CreateRoom(int cottageId, [FromBody] CreateCottageRoomRequest request)
     {
@@ -49,6 +51,7 @@ public class CottageRoomController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("Update-Room/{id}")]
     public async Task<IActionResult> UpdateRoom(int id, [FromBody] UpdateCottageRoomRequest request)
     {
@@ -62,6 +65,7 @@ public class CottageRoomController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Delete-Room/{roomId}")]
     public async Task<IActionResult> DeleteRoom(int roomId)
     {

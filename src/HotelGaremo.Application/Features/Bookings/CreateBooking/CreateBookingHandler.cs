@@ -23,6 +23,12 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Create
     {
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
+        var userExists = await _db.Users
+            .AnyAsync(x => x.Id == request.UserId && x.IsActive, cancellationToken);
+
+        if (!userExists)
+            throw new BadRequestException("მომხმარებელი ვერ მოიძებნა.");
+
         var cottage = await _db.Cottages
             .FirstOrDefaultAsync(x => x.Id == request.CottageId, cancellationToken);
 
@@ -42,11 +48,14 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Create
         if (isOccupied)
             throw new BadRequestException("კოტეჯი არჩეულ თარიღებზე დაკავებულია.");
 
-        var nights = (request.CheckOut - request.CheckIn).Days;
+        var checkIn = request.CheckIn.Date.AddHours(14);
+        var checkOut = request.CheckOut.Date.AddHours(12);
+
+        var nights = (request.CheckOut.Date - request.CheckIn.Date).Days;
         var totalPrice = nights * cottage.PricePerNight;
         var bookingNumber = $"BK-{DateTime.UtcNow:yyyyMMddHHmmss}-{request.CottageId}";
 
-        var booking = new Booking(bookingNumber, request.CheckIn, request.CheckOut,
+        var booking = new Booking(bookingNumber, checkIn, checkOut,
             request.GuestCount, request.UserId, request.CottageId, totalPrice, request.PaymentType);
 
         _db.Bookings.Add(booking);

@@ -106,6 +106,7 @@ public class ReviewController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Delete-Review-By-Admin/{reviewId}")]
     public async Task<IActionResult> DeleteReviewByAdmin(int reviewId)
     {

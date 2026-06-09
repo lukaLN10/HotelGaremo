@@ -42,6 +42,11 @@ public class Booking : BaseEntity
         BookingStatus = BookingStatus.Pending;
     }
 
+    public void SetGroupBookingNumber(string groupBookingNumber)
+    {
+        GroupBookingNumber = groupBookingNumber;
+    }
+
     public void ChangeStatus(BookingStatus status)
     {
         BookingStatus = status;

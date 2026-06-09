@@ -2,9 +2,11 @@
 using HotelGaremo.Application.Features.Cottages.CreateCottage;
 using HotelGaremo.Application.Features.Cottages.DeleteCottage;
 using HotelGaremo.Application.Features.Cottages.GetAllCottages;
+using HotelGaremo.Application.Features.Cottages.GetAvailableCottages;
 using HotelGaremo.Application.Features.Cottages.GetCottageById;
 using HotelGaremo.Application.Features.Cottages.UpdateCottage;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,6 +32,7 @@ public class CottageController : ControllerBase
         _logger = logger;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("Create-Cottage")]
     public async Task<IActionResult> CreateCottage([FromBody] CreateCottageCommand command)
     {
@@ -42,6 +45,7 @@ public class CottageController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("Update-Cottage/{id}")]
     public async Task<IActionResult> UpdateCottage(int id, [FromBody] UpdateCottageRequest request)
     {
@@ -79,6 +83,19 @@ public class CottageController : ControllerBase
         });
     }
 
+    [HttpGet("Get-Available-Cottages")]
+    public async Task<IActionResult> GetAvailableCottages([FromQuery] DateTime checkIn, [FromQuery] DateTime checkOut)
+    {
+        var response = await _mediator.Send(new GetAvailableCottagesQuery(checkIn, checkOut));
+        return Ok(new ApiResponse<List<GetAvailableCottagesResponse>>
+        {
+            StatusCode = 200,
+            Message = "თავისუფალი კოტეჯები წარმატებით მოიძებნა.",
+            Data = response
+        });
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Delete-Cottage/{cottageId}")]
     public async Task<IActionResult> DeleteCottage(int cottageId)
     {
