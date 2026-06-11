@@ -59,7 +59,7 @@ public class CottageController : ControllerBase
         });
     }
 
-    [HttpGet (" Get-All-Cottages")]
+    [HttpGet("Get-All-Cottages")]
     public async Task<IActionResult> GetAllCottages()
     {
         var response = await _mediator.Send(new GetAllCottagesQuery());

@@ -19,6 +19,7 @@ public class GetCottageByIdHandler : IRequestHandler<GetCottageByIdQuery, GetCot
         var cottage = await _db.Cottages
             .Include(x => x.Bookings)
             .Include(x => x.CottageRooms)
+            .Include(x => x.CottageImages)
             .FirstOrDefaultAsync(x => x.Id == request.CottageId, cancellationToken);
 
         if (cottage == null)
@@ -44,6 +45,7 @@ public class GetCottageByIdHandler : IRequestHandler<GetCottageByIdQuery, GetCot
                 r.RoomType,
                 r.HasJacuzzi,
                 r.BedCount,
-                r.SofaBedCount)).ToList());
+                r.SofaBedCount)).ToList(),
+            cottage.CottageImages.Select(i => i.ImageURL).ToList());
     }
 }

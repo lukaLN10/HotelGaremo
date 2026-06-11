@@ -28,7 +28,8 @@ public class GetAllCottagesHandler : IRequestHandler<GetAllCottagesQuery, List<G
               x.Description,
               x.RoomCount,
               x.PricePerNight,
-              x.MaxGuests))
+              x.MaxGuests,
+              x.CottageImages.Select(i => i.ImageURL).ToList()))
           .ToListAsync(cancellationToken);
 
     }

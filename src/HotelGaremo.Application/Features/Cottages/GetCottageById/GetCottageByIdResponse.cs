@@ -10,7 +10,8 @@ public record GetCottageByIdResponse(
     decimal PricePerNight,
     int MaxGuests,
     List<CottageBookingDto> Bookings,
-    List<CottageRoomDto> CottageRooms);
+    List<CottageRoomDto> CottageRooms,
+    List<string> ImageUrls);
 
 public record CottageBookingDto(
     string BookingNumber,

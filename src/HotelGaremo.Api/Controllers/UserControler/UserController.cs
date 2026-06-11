@@ -14,6 +14,7 @@ using HotelGaremo.Application.requests;
 using HotelGaremo.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -137,6 +138,23 @@ public class UserController : ControllerBase
         {
             StatusCode = 200,
             Message = response.Message,
+            Data = response
+        });
+    }
+
+    [Authorize]
+    [HttpGet("Get-My-Profile")]
+    public async Task<IActionResult> GetMyProfile()
+    {
+        var userIdClaim = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var response = await mediator.Send(new GetUserByIdQuery(userId));
+        return Ok(new ApiResponse<GetUserByIdResponse>
+        {
+            StatusCode = 200,
+            Message = "პროფილი წარმატებით მოიძებნა.",
             Data = response
         });
     }

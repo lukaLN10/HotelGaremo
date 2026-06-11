@@ -12,4 +12,5 @@ public record GetAllCottagesResponse(
     string Description,
     int RoomCount,
     decimal PricePerNight,
-    int MaxGuests);
+    int MaxGuests,
+    List<string> ImageUrls);
