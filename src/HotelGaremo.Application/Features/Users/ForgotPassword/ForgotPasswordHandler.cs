@@ -2,6 +2,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 using HotelGaremo.Application.Abstraction;
+using HotelGaremo.Application.Common;
 using HotelGaremo.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -41,8 +42,13 @@ public class ForgotPasswordHandler : IRequestHandler<ForgotPasswordCommand, Forg
 
         await _emailSender.SendEmailToUserAsync(
             request.Email,
-            "Password Recovery Code",
-            $"Your password recovery code is: {code}");
+            "პაროლის აღდგენის კოდი",
+            EmailTemplateBuilder.Layout(
+                "პაროლის აღდგენის კოდი",
+                EmailTemplateBuilder.Heading("პაროლის აღდგენა") +
+                EmailTemplateBuilder.Paragraph("პაროლის აღსადგენად შეიყვანეთ ქვემოთ მოცემული კოდი:") +
+                EmailTemplateBuilder.CodeBox(code.ToString()) +
+                EmailTemplateBuilder.Paragraph("თუ ეს მოთხოვნა თქვენ არ გაგზავნიათ, უგულებელყავით ეს წერილი.")));
 
         return new ForgotPasswordResponse("პაროლის აღდგენის კოდი გამოგზავნილია თქვენს მეილზე.");
     }

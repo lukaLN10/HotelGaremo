@@ -19,6 +19,13 @@
       "runtimeExecutable": "dotnet",
       "runtimeArgs": ["run", "--project", "C:\\Users\\lukaNoniashvili10\\Desktop\\Hotel Garemo\\src\\HotelGaremo.Api", "--launch-profile", "https"],
       "port": 7216
+    },
+    {
+      "name": "HotelGaremoAdminPanel",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start", "--prefix", "C:\\Users\\lukaNoniashvili10\\Desktop\\HotelGaremoAdminPanel", "--", "--port", "4400"],
+      "port": 4400,
+      "env": { "NODE_TLS_REJECT_UNAUTHORIZED": "0" }
     }
   ]
 }

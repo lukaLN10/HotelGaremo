@@ -67,18 +67,22 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Create
         await _db.SaveChangesAsync(cancellationToken);
 
         var subject = $"ახალი ჯავშანი: {bookingNumber}";
-        var body = $@"
-            <h3>შემოვიდა ახალი ჯავშანი</h3>
-            <p><b>ჯავშნის ნომერი:</b> {bookingNumber}</p>
-            <p><b>კოტეჯი:</b> {cottage.CottageName}</p>
-            <p><b>მომხმარებელი:</b> {user.Name} {user.LastName} ({user.Email}, {user.PhoneNumber})</p>
-            <p><b>შემოსვლა:</b> {checkIn:yyyy-MM-dd}</p>
-            <p><b>გასვლა:</b> {checkOut:yyyy-MM-dd}</p>
-            <p><b>ღამეები:</b> {nights}</p>
-            <p><b>სტუმრები:</b> {request.GuestCount}</p>
-            <p><b>ჯამური თანხა:</b> {totalPrice} ₾</p>
-            <p><b>გადახდის ტიპი:</b> {request.PaymentType}</p>
-            <p>გადაამოწმეთ საბანკო ანგარიში და, თანხის ჩარიცხვის დადასტურების შემთხვევაში, დაადასტურეთ ჯავშანი ადმინ პანელიდან.</p>";
+        var body = EmailTemplateBuilder.Layout(
+            subject,
+            EmailTemplateBuilder.Heading("შემოვიდა ახალი ჯავშანი") +
+            EmailTemplateBuilder.InfoTable(new (string, string)[]
+            {
+                ("ჯავშნის ნომერი", bookingNumber),
+                ("კოტეჯი", cottage.CottageName),
+                ("მომხმარებელი", $"{user.Name} {user.LastName} ({user.Email}, {user.PhoneNumber})"),
+                ("შემოსვლა", checkIn.ToString("yyyy-MM-dd")),
+                ("გასვლა", checkOut.ToString("yyyy-MM-dd")),
+                ("ღამეები", nights.ToString()),
+                ("სტუმრები", request.GuestCount.ToString()),
+                ("ჯამური თანხა", $"{totalPrice} ₾"),
+                ("გადახდის ტიპი", request.PaymentType.ToString()),
+            }) +
+            EmailTemplateBuilder.Paragraph("გადაამოწმეთ საბანკო ანგარიში და, თანხის ჩარიცხვის დადასტურების შემთხვევაში, დაადასტურეთ ჯავშანი ადმინ პანელიდან."));
 
         await _emailSender.SendEmailToAdminAsync(subject, body);
 

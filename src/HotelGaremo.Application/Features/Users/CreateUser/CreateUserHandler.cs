@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using HotelGaremo.Application.Abstraction;
+using HotelGaremo.Application.Common;
 using HotelGaremo.Application.Interfaces;
 using HotelGaremo.Domain.Entities;
 using MediatR;
@@ -48,8 +49,13 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
 
                 await emailSender.SendEmailToUserAsync(
                     request.Email,
-                    "Verification Code",
-                    $"Your verification code is: {verificationCode}");
+                    "თქვენი ვერიფიკაციის კოდი",
+                    EmailTemplateBuilder.Layout(
+                        "თქვენი ვერიფიკაციის კოდი",
+                        EmailTemplateBuilder.Heading("მოგესალმებით Garemo-ში!") +
+                        EmailTemplateBuilder.Paragraph("რეგისტრაციის დასასრულებლად შეიყვანეთ ქვემოთ მოცემული ვერიფიკაციის კოდი:") +
+                        EmailTemplateBuilder.CodeBox(verificationCode.ToString()) +
+                        EmailTemplateBuilder.Paragraph("თუ ეს მოთხოვნა თქვენ არ გაგზავნიათ, უგულებელყავით ეს წერილი.")));
 
                 return new CreateUserResponse(existingUser.Id);
             }
@@ -77,8 +83,13 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, CreateUserRe
 
         await emailSender.SendEmailToUserAsync(
             request.Email,
-            "Verification Code",
-            $"Your verification code is: {verificationCode}");
+            "თქვენი ვერიფიკაციის კოდი",
+            EmailTemplateBuilder.Layout(
+                "თქვენი ვერიფიკაციის კოდი",
+                EmailTemplateBuilder.Heading("მოგესალმებით Garemo-ში!") +
+                EmailTemplateBuilder.Paragraph("რეგისტრაციის დასასრულებლად შეიყვანეთ ქვემოთ მოცემული ვერიფიკაციის კოდი:") +
+                EmailTemplateBuilder.CodeBox(verificationCode.ToString()) +
+                EmailTemplateBuilder.Paragraph("თუ ეს მოთხოვნა თქვენ არ გაგზავნიათ, უგულებელყავით ეს წერილი.")));
 
         return new CreateUserResponse(user.Id);
     }

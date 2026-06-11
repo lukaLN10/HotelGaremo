@@ -31,14 +31,18 @@ public class NotifyBookingPaymentHandler : IRequestHandler<NotifyBookingPaymentC
             throw new BadRequestException("თქვენ არ გაქვთ ამ ჯავშნის შესახებ შეტყობინების გაგზავნის უფლება.");
 
         var subject = $"გადახდის შეტყობინება: {booking.BookingNumber}";
-        var body = $@"
-            <h3>მომხმარებელმა განაცხადა, რომ თანხა ჩარიცხა</h3>
-            <p><b>ჯავშნის ნომერი:</b> {booking.BookingNumber}</p>
-            <p><b>კოტეჯი:</b> {booking.Cottage.CottageName}</p>
-            <p><b>მომხმარებელი:</b> {booking.User.Name} {booking.User.LastName} ({booking.User.Email}, {booking.User.PhoneNumber})</p>
-            <p><b>თანხა:</b> {booking.TotalPrice} ₾</p>
-            <p><b>გადახდის ტიპი:</b> {booking.PaymentType}</p>
-            <p>გთხოვთ გადაამოწმოთ საბანკო ანგარიში და, თანხის ჩარიცხვის დადასტურების შემთხვევაში, დაადასტუროთ ჯავშანი ადმინ პანელიდან.</p>";
+        var body = EmailTemplateBuilder.Layout(
+            subject,
+            EmailTemplateBuilder.Heading("მომხმარებელმა განაცხადა, რომ თანხა ჩარიცხა") +
+            EmailTemplateBuilder.InfoTable(new (string, string)[]
+            {
+                ("ჯავშნის ნომერი", booking.BookingNumber),
+                ("კოტეჯი", booking.Cottage.CottageName),
+                ("მომხმარებელი", $"{booking.User.Name} {booking.User.LastName} ({booking.User.Email}, {booking.User.PhoneNumber})"),
+                ("თანხა", $"{booking.TotalPrice} ₾"),
+                ("გადახდის ტიპი", booking.PaymentType.ToString()),
+            }) +
+            EmailTemplateBuilder.Paragraph("გთხოვთ გადაამოწმოთ საბანკო ანგარიში და, თანხის ჩარიცხვის დადასტურების შემთხვევაში, დაადასტუროთ ჯავშანი ადმინ პანელიდან."));
 
         await _emailSender.SendEmailToAdminAsync(subject, body);
 

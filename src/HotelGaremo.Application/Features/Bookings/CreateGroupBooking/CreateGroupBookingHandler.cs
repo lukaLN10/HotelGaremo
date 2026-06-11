@@ -79,25 +79,28 @@ public class CreateGroupBookingHandler : IRequestHandler<CreateGroupBookingComma
             _db.Bookings.Add(booking);
             bookingNumbers.Add(bookingNumber);
             totalPriceSum += totalPrice;
-            cottageRows.Add($"<li><b>{cottage.CottageName}</b> ({bookingNumber}) — {totalPrice} ₾</li>");
+            cottageRows.Add($"<b>{cottage.CottageName}</b> ({bookingNumber}) — {totalPrice} ₾");
         }
 
         await _db.SaveChangesAsync(cancellationToken);
 
         var subject = $"ახალი ჯგუფური ჯავშანი: {groupBookingNumber}";
-        var body = $@"
-            <h3>შემოვიდა ახალი ჯგუფური ჯავშანი</h3>
-            <p><b>ჯგუფური ჯავშნის ნომერი:</b> {groupBookingNumber}</p>
-            <p><b>მომხმარებელი:</b> {user.Name} {user.LastName} ({user.Email}, {user.PhoneNumber})</p>
-            <p><b>შემოსვლა:</b> {checkIn:yyyy-MM-dd}</p>
-            <p><b>გასვლა:</b> {checkOut:yyyy-MM-dd}</p>
-            <p><b>ღამეები:</b> {nights}</p>
-            <p><b>სტუმრები:</b> {request.GuestCount}</p>
-            <p><b>კოტეჯები:</b></p>
-            <ul>{string.Join("", cottageRows)}</ul>
-            <p><b>ჯამური თანხა:</b> {totalPriceSum} ₾</p>
-            <p><b>გადახდის ტიპი:</b> {request.PaymentType}</p>
-            <p>გადაამოწმეთ საბანკო ანგარიში და, თანხის ჩარიცხვის დადასტურების შემთხვევაში, დაადასტურეთ ჯავშანი ადმინ პანელიდან.</p>";
+        var body = EmailTemplateBuilder.Layout(
+            subject,
+            EmailTemplateBuilder.Heading("შემოვიდა ახალი ჯგუფური ჯავშანი") +
+            EmailTemplateBuilder.InfoTable(new (string, string)[]
+            {
+                ("ჯგუფური ჯავშნის ნომერი", groupBookingNumber),
+                ("მომხმარებელი", $"{user.Name} {user.LastName} ({user.Email}, {user.PhoneNumber})"),
+                ("შემოსვლა", checkIn.ToString("yyyy-MM-dd")),
+                ("გასვლა", checkOut.ToString("yyyy-MM-dd")),
+                ("ღამეები", nights.ToString()),
+                ("სტუმრები", request.GuestCount.ToString()),
+                ("კოტეჯები", string.Join("<br/>", cottageRows)),
+                ("ჯამური თანხა", $"{totalPriceSum} ₾"),
+                ("გადახდის ტიპი", request.PaymentType.ToString()),
+            }) +
+            EmailTemplateBuilder.Paragraph("გადაამოწმეთ საბანკო ანგარიში და, თანხის ჩარიცხვის დადასტურების შემთხვევაში, დაადასტურეთ ჯავშანი ადმინ პანელიდან."));
 
         await _emailSender.SendEmailToAdminAsync(subject, body);
 
