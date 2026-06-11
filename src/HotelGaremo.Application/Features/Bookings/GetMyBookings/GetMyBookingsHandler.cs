@@ -21,13 +21,15 @@ public class GetMyBookingsHandler : IRequestHandler<GetMyBookingsQuery, List<Get
             .Select(x => new GetMyBookingsResponse(
                 x.Id,
                 x.BookingNumber,
+                x.GroupBookingNumber,
                 x.Cottage.CottageName,
                 x.CheckIn,
                 x.CheckOut,
                 x.GuestCount,
                 x.TotalPrice,
                 x.PaymentType,
-                x.BookingStatus))
+                x.BookingStatus,
+                x.CreatedAt))
             .ToListAsync(cancellationToken);
     }
 }

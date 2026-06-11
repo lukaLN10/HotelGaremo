@@ -7,6 +7,7 @@ using HotelGaremo.Application.Features.Bookings.GetAllBookings;
 using HotelGaremo.Application.Features.Bookings.GetBookingById;
 using HotelGaremo.Application.Features.Bookings.GetCottageBookings;
 using HotelGaremo.Application.Features.Bookings.GetMyBookings;
+using HotelGaremo.Application.Features.Bookings.NotifyBookingPayment;
 using HotelGaremo.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -74,10 +75,40 @@ public class BookingController : ControllerBase
         });
     }
 
+    [Authorize]
+    [HttpPost("Notify-Payment/{bookingNumber}")]
+    public async Task<IActionResult> NotifyPayment(string bookingNumber)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var command = new NotifyBookingPaymentCommand(bookingNumber) { UserId = userId };
+        var response = await _mediator.Send(command);
+        return Ok(new ApiResponse<NotifyBookingPaymentResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpPut("Cancel-Booking/{bookingId}/{userId}")]
     public async Task<IActionResult> CancelBooking(int bookingId, int userId)
     {
+        var command = new CancelBookingCommand(bookingId) { UserId = userId };
+        var response = await _mediator.Send(command);
+        return Ok(new ApiResponse<CancelBookingResponse>
+        {
+            StatusCode = 200,
+            Message = response.Message,
+            Data = response
+        });
+    }
+
+    [Authorize]
+    [HttpPut("Cancel-My-Booking/{bookingId}")]
+    public async Task<IActionResult> CancelMyBooking(int bookingId)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var command = new CancelBookingCommand(bookingId) { UserId = userId };
         var response = await _mediator.Send(command);
         return Ok(new ApiResponse<CancelBookingResponse>

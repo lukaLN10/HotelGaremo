@@ -16,4 +16,5 @@ public enum BookingStatus
     CheckedOut,
     NoShow,
     Completed,
+    Expired,
 }

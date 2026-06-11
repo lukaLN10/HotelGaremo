@@ -22,6 +22,16 @@ internal class EmailSender : IEmailSender
 
     public async Task SendEmailToUserAsync(string to, string subject, string content)
     {
+        await SendAsync(to, subject, content);
+    }
+
+    public async Task SendEmailToAdminAsync(string subject, string content)
+    {
+        await SendAsync(_emailSettings.AdminEmail, subject, content);
+    }
+
+    private async Task SendAsync(string to, string subject, string content)
+    {
         using var smtpClient = new SmtpClient(_emailSettings.Host, _emailSettings.Port)
         {
             EnableSsl = _emailSettings.EnableSsl,

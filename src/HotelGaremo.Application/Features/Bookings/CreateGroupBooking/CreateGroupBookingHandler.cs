@@ -1,6 +1,7 @@
 using FluentValidation;
 using HotelGaremo.Application.Abstraction;
 using HotelGaremo.Application.Common;
+using HotelGaremo.Application.Interfaces;
 using HotelGaremo.Domain.Entities;
 using HotelGaremo.Domain.Enums;
 using MediatR;
@@ -12,21 +13,25 @@ public class CreateGroupBookingHandler : IRequestHandler<CreateGroupBookingComma
 {
     private readonly IDataContext _db;
     private readonly IValidator<CreateGroupBookingCommand> _validator;
+    private readonly IEmailSender _emailSender;
 
-    public CreateGroupBookingHandler(IDataContext db, IValidator<CreateGroupBookingCommand> validator)
+    public CreateGroupBookingHandler(IDataContext db, IValidator<CreateGroupBookingCommand> validator, IEmailSender emailSender)
     {
         _db = db;
         _validator = validator;
+        _emailSender = emailSender;
     }
 
     public async Task<CreateGroupBookingResponse> Handle(CreateGroupBookingCommand request, CancellationToken cancellationToken)
     {
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var userExists = await _db.Users
-            .AnyAsync(x => x.Id == request.UserId && x.IsActive, cancellationToken);
+        BookingTimeWindow.EnsureWithinBookingHours();
 
-        if (!userExists)
+        var user = await _db.Users
+            .FirstOrDefaultAsync(x => x.Id == request.UserId && x.IsActive, cancellationToken);
+
+        if (user == null)
             throw new BadRequestException("მომხმარებელი ვერ მოიძებნა.");
 
         var checkIn = request.CheckIn.Date.AddHours(14);
@@ -34,6 +39,8 @@ public class CreateGroupBookingHandler : IRequestHandler<CreateGroupBookingComma
         var nights = (request.CheckOut.Date - request.CheckIn.Date).Days;
         var groupBookingNumber = $"GRP-{DateTime.UtcNow:yyyyMMddHHmmss}";
         var bookingNumbers = new List<string>();
+        var totalPriceSum = 0m;
+        var cottageRows = new List<string>();
 
         var cottages = await _db.Cottages
             .Where(x => request.CottageIds.Contains(x.Id))
@@ -71,9 +78,28 @@ public class CreateGroupBookingHandler : IRequestHandler<CreateGroupBookingComma
 
             _db.Bookings.Add(booking);
             bookingNumbers.Add(bookingNumber);
+            totalPriceSum += totalPrice;
+            cottageRows.Add($"<li><b>{cottage.CottageName}</b> ({bookingNumber}) — {totalPrice} ₾</li>");
         }
 
         await _db.SaveChangesAsync(cancellationToken);
+
+        var subject = $"ახალი ჯგუფური ჯავშანი: {groupBookingNumber}";
+        var body = $@"
+            <h3>შემოვიდა ახალი ჯგუფური ჯავშანი</h3>
+            <p><b>ჯგუფური ჯავშნის ნომერი:</b> {groupBookingNumber}</p>
+            <p><b>მომხმარებელი:</b> {user.Name} {user.LastName} ({user.Email}, {user.PhoneNumber})</p>
+            <p><b>შემოსვლა:</b> {checkIn:yyyy-MM-dd}</p>
+            <p><b>გასვლა:</b> {checkOut:yyyy-MM-dd}</p>
+            <p><b>ღამეები:</b> {nights}</p>
+            <p><b>სტუმრები:</b> {request.GuestCount}</p>
+            <p><b>კოტეჯები:</b></p>
+            <ul>{string.Join("", cottageRows)}</ul>
+            <p><b>ჯამური თანხა:</b> {totalPriceSum} ₾</p>
+            <p><b>გადახდის ტიპი:</b> {request.PaymentType}</p>
+            <p>გადაამოწმეთ საბანკო ანგარიში და, თანხის ჩარიცხვის დადასტურების შემთხვევაში, დაადასტურეთ ჯავშანი ადმინ პანელიდან.</p>";
+
+        await _emailSender.SendEmailToAdminAsync(subject, body);
 
         return new CreateGroupBookingResponse(
             "ჯგუფური ჯავშანი წარმატებით შეიქმნა.",

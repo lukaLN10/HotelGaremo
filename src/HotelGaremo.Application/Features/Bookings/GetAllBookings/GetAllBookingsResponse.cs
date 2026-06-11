@@ -5,6 +5,7 @@ namespace HotelGaremo.Application.Features.Bookings.GetAllBookings;
 public record GetAllBookingsResponse(
     int Id,
     string BookingNumber,
+    string? GroupBookingNumber,
     string CottageName,
     string UserName,
     string UserLastName,

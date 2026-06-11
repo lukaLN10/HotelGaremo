@@ -13,4 +13,5 @@ internal class EmailSettings
     public bool EnableSsl { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
+    public string AdminEmail { get; set; }
 }

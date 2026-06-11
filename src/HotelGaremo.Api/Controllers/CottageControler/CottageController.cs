@@ -3,6 +3,7 @@ using HotelGaremo.Application.Features.Cottages.CreateCottage;
 using HotelGaremo.Application.Features.Cottages.DeleteCottage;
 using HotelGaremo.Application.Features.Cottages.GetAllCottages;
 using HotelGaremo.Application.Features.Cottages.GetAvailableCottages;
+using HotelGaremo.Application.Features.Cottages.GetCottageBookedDates;
 using HotelGaremo.Application.Features.Cottages.GetCottageById;
 using HotelGaremo.Application.Features.Cottages.UpdateCottage;
 using MediatR;
@@ -91,6 +92,18 @@ public class CottageController : ControllerBase
         {
             StatusCode = 200,
             Message = "თავისუფალი კოტეჯები წარმატებით მოიძებნა.",
+            Data = response
+        });
+    }
+
+    [HttpGet("Get-Booked-Dates/{cottageId}")]
+    public async Task<IActionResult> GetCottageBookedDates(int cottageId)
+    {
+        var response = await _mediator.Send(new GetCottageBookedDatesQuery(cottageId));
+        return Ok(new ApiResponse<List<GetCottageBookedDatesResponse>>
+        {
+            StatusCode = 200,
+            Message = "დაკავებული თარიღები წარმატებით მოიძებნა.",
             Data = response
         });
     }

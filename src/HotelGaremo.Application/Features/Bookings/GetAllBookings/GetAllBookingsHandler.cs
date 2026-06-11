@@ -21,6 +21,7 @@ public class GetAllBookingsHandler : IRequestHandler<GetAllBookingsQuery, List<G
             .Select(x => new GetAllBookingsResponse(
                 x.Id,
                 x.BookingNumber,
+                x.GroupBookingNumber,
                 x.Cottage.CottageName,
                 x.User.Name,
                 x.User.LastName,

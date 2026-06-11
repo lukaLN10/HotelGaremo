@@ -26,7 +26,22 @@ public class ChangeBookingStatusHandler : IRequestHandler<ChangeBookingStatusCom
         if (booking == null)
             throw new BadRequestException("ჯავშანი ვერ მოიძებნა.");
 
-        booking.ChangeStatus(request.BookingStatus);
+        if (booking.GroupBookingNumber != null)
+        {
+            var groupBookings = await _db.Bookings
+                .Where(x => x.GroupBookingNumber == booking.GroupBookingNumber)
+                .ToListAsync(cancellationToken);
+
+            foreach (var groupBooking in groupBookings)
+            {
+                groupBooking.ChangeStatus(request.BookingStatus);
+            }
+        }
+        else
+        {
+            booking.ChangeStatus(request.BookingStatus);
+        }
+
         await _db.SaveChangesAsync(cancellationToken);
 
         return new ChangeBookingStatusResponse("ჯავშნის სტატუსი წარმატებით განახლდა.");
